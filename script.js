@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initParallaxEffect();
     initCounterAnimation();
     initProjectHoverEffects();
+    initFloatingIcons();
 });
 
 // Navigation functionality
@@ -314,7 +315,7 @@ function initParallaxEffect() {
         floatingElements.forEach((element, index) => {
             const speed = 0.3 + (index * 0.1);
             const yPos = -(scrolled * speed);
-            element.style.transform = `translateY(${yPos}px)`;
+            element.style.transform = `translateY(${yPos}px) translateX(var(--tx, 0))`;
         });
     });
 }
@@ -366,6 +367,25 @@ function initProjectHoverEffects() {
         
         card.addEventListener('mouseleave', () => {
             card.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+}
+
+// Floating icons enhancement
+function initFloatingIcons() {
+    const floatingElements = document.querySelectorAll('.floating-element');
+    
+    floatingElements.forEach(element => {
+        // Add random slight movement to make it more dynamic
+        const randomX = (Math.random() - 0.5) * 10;
+        element.style.setProperty('--tx', `${randomX}px`);
+        
+        // Add click effect
+        element.addEventListener('click', () => {
+            element.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                element.style.transform = '';
+            }, 300);
         });
     });
 }
