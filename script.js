@@ -1,7 +1,7 @@
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize EmailJS with your Public Key
-    emailjs.init("r3BlcMIylkXvfaeHs"); // Replace with your actual public key
+    emailjs.init("r3BlcMIylkXvfaeHs");
     
     // Initialize all functionality
     initNavigation();
@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initContactForm();
     initScrollToTop();
     initParallaxEffect();
+    initCounterAnimation();
+    initProjectHoverEffects();
 });
 
 // Navigation functionality
@@ -18,6 +20,8 @@ function initNavigation() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
+    
+    if (!hamburger || !navMenu) return;
     
     // Mobile menu toggle
     hamburger.addEventListener('click', () => {
@@ -76,6 +80,8 @@ function initNavigation() {
     // Navbar background on scroll
     window.addEventListener('scroll', () => {
         const navbar = document.querySelector('.navbar');
+        if (!navbar) return;
+        
         if (window.scrollY > 50) {
             navbar.style.background = 'rgba(255, 255, 255, 0.98)';
             navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.15)';
@@ -106,8 +112,8 @@ function initScrollAnimations() {
         .timeline-item,
         .project-card,
         .skill-category,
-        .about-content,
-        .contact-content
+        .about-content > *,
+        .contact-content > *
     `);
     
     animatedElements.forEach(el => {
@@ -239,28 +245,12 @@ function showNotification(message, type) {
     
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = `notification ${type === 'error' ? 'error' : ''}`;
     notification.innerHTML = `
         <div class="notification-content">
             <span class="notification-message">${message}</span>
             <button class="notification-close">&times;</button>
         </div>
-    `;
-    
-    // Add styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
-        color: ${type === 'success' ? '#155724' : '#721c24'};
-        padding: 1rem 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        z-index: 10000;
-        max-width: 400px;
-        animation: slideIn 0.3s ease;
-        border: 1px solid ${type === 'success' ? '#c3e6cb' : '#f5c6cb'};
     `;
     
     // Add to document
@@ -286,25 +276,6 @@ function initScrollToTop() {
     const scrollToTopBtn = document.createElement('button');
     scrollToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
     scrollToTopBtn.className = 'scroll-to-top';
-    scrollToTopBtn.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        z-index: 1000;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    `;
     
     document.body.appendChild(scrollToTopBtn);
     
@@ -323,17 +294,6 @@ function initScrollToTop() {
             top: 0,
             behavior: 'smooth'
         });
-    });
-    
-    // Hover effects
-    scrollToTopBtn.addEventListener('mouseenter', () => {
-        scrollToTopBtn.style.transform = 'translateY(-3px)';
-        scrollToTopBtn.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.3)';
-    });
-    
-    scrollToTopBtn.addEventListener('mouseleave', () => {
-        scrollToTopBtn.style.transform = 'translateY(0)';
-        scrollToTopBtn.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
     });
 }
 
@@ -367,19 +327,23 @@ function initCounterAnimation() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const counter = entry.target;
-                const target = parseInt(counter.textContent);
-                let current = 0;
-                const increment = target / 50;
+                const text = counter.textContent;
                 
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= target) {
-                        counter.textContent = target + '+';
-                        clearInterval(timer);
-                    } else {
-                        counter.textContent = Math.floor(current) + '+';
-                    }
-                }, 50);
+                if (text.includes('+') || text.includes('%')) {
+                    const target = parseInt(text);
+                    let current = 0;
+                    const increment = target / 50;
+                    
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            counter.textContent = text;
+                            clearInterval(timer);
+                        } else {
+                            counter.textContent = Math.floor(current) + (text.includes('%') ? '%' : '+');
+                        }
+                    }, 50);
+                }
                 
                 counterObserver.unobserve(counter);
             }
@@ -405,45 +369,3 @@ function initProjectHoverEffects() {
         });
     });
 }
-
-// Initialize all additional features
-document.addEventListener('DOMContentLoaded', function() {
-    initCounterAnimation();
-    initProjectHoverEffects();
-});
-
-// Add CSS for slideIn animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    .notification-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    
-    .notification-close {
-        background: none;
-        border: none;
-        font-size: 1.2rem;
-        cursor: pointer;
-        padding: 0;
-        margin-left: 1rem;
-        opacity: 0.7;
-    }
-    
-    .notification-close:hover {
-        opacity: 1;
-    }
-`;
-document.head.appendChild(style);
