@@ -1,7 +1,7 @@
 // script.js
-// Initialize EmailJS with your Public Key (REPLACE WITH YOUR ACTUAL KEY)
+// Initialize EmailJS with your Public Key (FROM YOUR JS FILE)
 (function() {
-    emailjs.init("YOUR_PUBLIC_KEY_HERE"); // Get from https://www.emailjs.com
+    emailjs.init("r3BlcMIylkXvfaeHs"); // Your actual public key from previous file
 })();
 
 // DOM Ready
@@ -142,37 +142,70 @@ document.addEventListener('DOMContentLoaded', function() {
         skillsCloud.appendChild(skillEl);
     });
 
-    // ===== CONTACT FORM =====
+    // ===== CONTACT FORM WITH YOUR EMAILJS CREDENTIALS =====
     const contactForm = document.getElementById('contactForm');
     const toast = document.getElementById('toast');
 
     contactForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // Show loading state
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        submitBtn.disabled = true;
+
         // Get form data
         const formData = {
-            sender_name: document.getElementById('senderName').value,
-            sender_email: document.getElementById('senderEmail').value,
+            from_name: document.getElementById('senderName').value,
+            from_email: document.getElementById('senderEmail').value,
+            subject: "Automation Proposal Request from Portfolio",
             message: document.getElementById('message').value,
-            to_name: "Pravin Deshmukh",
             to_email: "pravindeshmukh8702@gmail.com"
         };
 
-        // Send email using EmailJS
-        emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData) // REPLACE WITH YOUR IDs
-            .then(function(response) {
-                console.log('SUCCESS!', response.status, response.text);
-                // Show success toast
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 4000);
-                // Reset form
-                contactForm.reset();
-            }, function(error) {
-                console.log('FAILED...', error);
-                alert('Oops! Something went wrong. Please email me directly at pravindeshmukh8702@gmail.com');
-            });
+        console.log("Sending email with data:", formData);
+
+        // Send email using YOUR EmailJS credentials from your previous file
+        emailjs.send(
+            "service_lioj3gi",  // Your Service ID
+            "template_61v5d9b", // Your Template ID
+            formData
+        )
+        .then(function(response) {
+            console.log('SUCCESS!', response.status, response.text);
+            
+            // Show success toast
+            toast.textContent = "✓ Automation request sent! I'll contact you soon.";
+            toast.classList.add('show');
+            
+            // Reset form
+            contactForm.reset();
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            // Hide toast after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
+            
+        }, function(error) {
+            console.log('FAILED...', error);
+            
+            // Show error message
+            toast.textContent = "Failed to send. Please email me directly at pravindeshmukh8702@gmail.com";
+            toast.classList.add('show');
+            toast.style.borderLeftColor = "var(--danger)";
+            
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            // Hide toast after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.style.borderLeftColor = "var(--primary)";
+            }, 5000);
+        });
     });
 
     // ===== SMOOTH SCROLL FOR NAV LINKS =====
@@ -211,5 +244,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    console.log('🤖 Automation Portfolio v2.0 Loaded');
+    console.log('🤖 Pravin Automates Portfolio v2.0 Loaded');
 });
+
+// Add CSS for animations and notifications
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fa-spin {
+        animation: fa-spin 1s infinite linear;
+    }
+    
+    @keyframes fa-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .toast.show {
+        transform: translateX(0);
+        animation: slideInRight 0.5s ease;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+`;
+document.head.appendChild(style);
